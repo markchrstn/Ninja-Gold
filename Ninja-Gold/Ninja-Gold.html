@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html>
+<head>
+<!-- Bootstrap -->
+    <link href="css/bootstrap.min.css" rel="stylesheet" media="screen">
+    <script src="http://code.jquery.com/jquery.js"></script>
+    <script src="js/bootstrap.min.js"></script>
+    
+    <!-- main css -->
+    <link rel="stylesheet" type="text/css" href="css/main.css">
+	<title>Ninja Gold</title>
+
+
+</head>
+<body>
+
+<div class="container-upper width-100-percent height-100-percent">
+<center>
+<h2 class="head-style"> Ninja Gold </h2>
+</center>
+</div>
+
+  <div class="form-group">
+    <center>
+    <label>Gold Earned:</label>
+    <input type="text" class="btn" id="current-gold" value="0" disabled="true" style="">
+    <label>Total Attempts</label>
+    <input type="text" class="btn" id="ctr-attempt" disabled="true">
+    </center>
+  </div>
+
+  <div class="container-btn">
+  <center>
+	<button class="btn btn-success" id="btn-cave">Cave</button>
+  <button class="btn btn-success" id="btn-house">House</button>
+  <button class="btn btn-success" id="btn-casino">Casino</button>
+  <button class="btn btn-success" id="btn-goldmine">Gold Mine</button>
+  <button class="btn btn-warning" id="btn-reset">Reset</button>
+  </div>
+  
+  <div class="ninja-background">
+    
+    <img src="img/back.jpg" width="100%" height="500px" class="position-absolute">
+    <img src="img/ninja.png" width="150px" height="150px" class="ninja img-ninja position-absolute" id="ninja">
+    
+  </div>
+  
+  <div class="container-fluid paddingtop100">
+  </div>
+  <div class="container-fluid extra-div">
+    <center>
+    <ul class="nav nav-tabs">
+  <li class="active"><a data-toggle="tab" href="#home">All Log</a></li>
+  <li><a data-toggle="tab" href="#menu1">Gain Log</a></li>
+  <li><a data-toggle="tab" href="#menu2">Loss Log</a></li>
+</ul>
+
+<div class="tab-content">
+  <div id="home" class="tab-pane fade in active">
+    <h3>All Log </h3>
+    <label>Total Gain:</label>
+    <input type="text" class="btn" id="total-gain" value="0" disabled="true" style="">
+    <label>Total Loss:</label>
+    <input type="text" class="btn" id="total-loss" value="0" disabled="true" style="">
+    <div id="log-result"></div>
+  </div>
+  <div id="menu1" class="tab-pane fade">
+    <h3>Gain Log</h3>
+    <div id="log-result-gain"></div>
+  </div>
+  <div id="menu2" class="tab-pane fade">
+    <h3>Loss Log</h3>
+    <div id="log-result-loss"></div>
+  </div>
+</div>
+  </center>
+</div>
+
+<script>
+
+$(document).ready(function(){
+  
+  var curGold = 0;
+  var totalAttempts = 20;
+
+  var mineGold = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25];
+  var casinoGold = [40,41,42,43,44,45,46,47,48,49,50];
+  var casinoGold2 = [-40,-41,-42,-43,-44,-45,-46,-47,-48,-49,-50];
+  var probes = [80, 20];
+
+  var log = [];
+
+  var totalgoldGain = [];
+  var totalgoldLoss = [];
+
+  var ctr = -1;
+  
+    
+  function sumGainGold(){
+    var sum = totalgoldGain.reduce((a, b) => a + b, 0);
+    return sum;
+  }
+
+  function sumLossGold(){
+    var sum = totalgoldLoss.reduce((a, b) => a + b, 0);
+    return sum;
+  }
+
+
+  function getRandomArbitrary(min, max) {
+    return Math.random() * (max - min) + min;
+}
+
+  function disabledButtons(){
+    $("#btn-cave").prop('disabled', true);
+    $("#btn-house").prop('disabled', true);
+    $("#btn-goldmine").prop('disabled', true);
+    $("#btn-casino").prop('disabled', true);
+  }
+
+  function check_game_clear()
+  {
+   alert("Congratulations! You have cleared the game. =)") 
+   $("#btn-cave").prop('disabled', true);
+   $("#btn-house").prop('disabled', true);
+   $("#btn-casino").prop('disabled', true);
+   $("#btn-goldmine").prop('disabled', true);
+  }
+
+    function getEvents(obj){
+      
+      ctr+=1;
+      var totalGain;
+       
+      if(curGold >= 250)
+      {
+        check_game_clear()
+      }
+
+      var sumGain1 = sumGainGold();
+      var sumLoss1 = sumLossGold();
+      
+      $('#total-gain').val(sumGain1);
+      $('#total-loss').val(sumLoss1);
+      
+      var current_gold_gained = obj[ctr]['total'];
+      
+      $('#current-gold').val(current_gold_gained);
+      if(obj[ctr]['gold'] > 0)
+      {
+          $("#log-result").append("<p style='color: green'>Location: " + obj[ctr]['location'] + " Date: " + obj[ctr]['date'] +  " Gold Earned: " + obj[ctr]['gold'] + "</p>")
+          $("#log-result-gain").append("<p style='color: green'>Location: " + obj[ctr]['location'] + " Date: " + obj[ctr]['date'] +  " Gold Earned: " + obj[ctr]['gold'] + "</p>")
+          
+      }
+      if(obj[ctr]['gold'] < 0)
+      {   
+          $("#log-result").append("<p style='color: red'>Location: " + obj[ctr]['location'] + " Date: " + obj[ctr]['date'] +  " Gold Earned: " + obj[ctr]['gold'] + "</p>")
+          $("#log-result-loss").append("<p style='color: red'>Location: " + obj[ctr]['location'] + " Date: " + obj[ctr]['date'] +  " Gold Earned: " + obj[ctr]['gold'] + "</p>") 
+      }
+      if(obj[ctr]['gold'] == 0)
+      {
+          $("#log-result").append("<p style='color: black'>Location: " + obj[ctr]['location'] + " Date: " + obj[ctr]['date'] +  " Gold Earned: 0 "  + "</p>")
+          $("#log-result-gain").append("<p style='color: black'>Location: " + obj[ctr]['location'] + " Date: " + obj[ctr]['date'] +  " Gold Earned: 0" + "</p>") 
+      }
+    }
+
+  document.getElementById('ctr-attempt').value = totalAttempts;
+
+$("#btn-cave").click(function(){
+ 
+  $("#ninja").animate({
+    right: "+50"
+  });
+
+  if(totalAttempts == 1)
+  {
+    disabledButtons();
+  }
+
+
+  var date = new Date;
+  curGold+= 5;
+  var gold_gain = 5;
+  var logItem = {
+      location: 'Cave',
+      date: date,
+      gold: 5,
+      total: curGold};
+  
+  totalgoldGain.push(gold_gain);
+  log.push(logItem);
+  
+  getEvents(log);
+  
+ 
+  // $('#log-result').append("<p style='color:green'>You have gained 5 coin.</p>");
+  // alert(JSON.stringify(log));// alert array data
+  // document.getElementById('current-gold').value = curGold;
+  totalAttempts= totalAttempts - 1;
+  document.getElementById('ctr-attempt').value = totalAttempts;
+  
+
+});
+
+$("#btn-house").click(function(){
+
+    $("#ninja").animate({
+    right: "+330"
+  });
+    if(totalAttempts == 1)
+  {
+    disabledButtons();
+  }
+
+    var prob_percent = getRandomArbitrary(20, 80);    
+    var date = new Date;
+
+    if(prob_percent <= 70)
+    {
+      
+      curGold+= 10;
+      var gold_gain = 10;
+      var logItem = { location: 'House', date: date, gold: 10,
+      total: curGold};
+      log.push(logItem);
+      totalgoldGain.push(gold_gain);
+      getEvents(log);
+
+      totalAttempts= totalAttempts - 1;
+      document.getElementById('ctr-attempt').value = totalAttempts;
+
+    }
+    else{
+
+      curGold+= 0;
+      var gold_gain = 0;
+      var logItem = { location: 'House', date: date, gold: 0,
+      total: curGold };
+      log.push(logItem);
+      totalgoldGain.push(gold_gain);
+      getEvents(log)
+
+      totalAttempts= totalAttempts - 1;
+      document.getElementById('ctr-attempt').value = totalAttempts;
+
+    }
+});
+$("#btn-casino").click(function(){
+ 
+     $("#ninja").animate({
+    right: "+820"
+  });
+
+    if(totalAttempts == 1)
+  {
+    disabledButtons();
+  }
+    
+
+      var coin = function() {
+        return (Math.random() < 0.5 ? 0 : 1);
+    }
+
+    var damage = 25*coin();
+    // alert(damage)
+    if(damage==0) 
+    {
+      var date = new Date;
+      var randCas = casinoGold[Math.floor(Math.random() * casinoGold.length)];
+      curGold+= randCas;
+      var gold_gain = randCas;
+      var logItem = { location: 'Casino', date: date, gold: randCas,
+      total: curGold };
+      log.push(logItem);
+      totalgoldGain.push(gold_gain);
+      getEvents(log)
+
+      totalAttempts= totalAttempts - 1;
+      document.getElementById('ctr-attempt').value = totalAttempts;      
+    }
+    else{
+        var date = new Date;
+        var randCas = casinoGold2[Math.floor(Math.random() * casinoGold2.length)];
+        var gold_loss = randCas;
+        curGold = curGold - -randCas;
+        var logItem = { location: 'Casino', date: date, gold: randCas,
+      total: curGold };
+        log.push(logItem);
+        totalgoldLoss.push(gold_loss);
+        getEvents(log);
+
+        totalAttempts= totalAttempts - 1;
+        document.getElementById('ctr-attempt').value = totalAttempts;
+    }
+
+});
+$("#btn-goldmine").click(function(){
+     $("#ninja").animate({
+    right: "+580"
+  });
+
+    if(totalAttempts == 1)
+  {
+    disabledButtons();
+  }
+
+
+    var prob_percent = getRandomArbitrary(20, 80);
+    if(prob_percent < 70)
+    {
+        var date = new Date;
+        var rand = mineGold[Math.floor(Math.random() * mineGold.length)];
+        var gold_gain = rand;
+        curGold+= rand;
+        var logItem = { location: 'Gold Mine', date: date, gold: rand, winLoss: "gain",
+        total: curGold };
+        log.push(logItem);
+        totalgoldGain.push(gold_gain);
+        getEvents(log);
+   
+        totalAttempts= totalAttempts - 1;
+        document.getElementById('ctr-attempt').value = totalAttempts;
+    }
+    else
+    {
+        var date = new Date;
+        curGold+= 0;
+        var gold_gain = 0;
+        var logItem = { location: 'Gold Mine', date: date, gold: 0, winLoss: 'gain',
+      total: curGold };
+        log.push(logItem);
+        totalgoldGain.push(gold_gain);
+        getEvents(log);
+        totalAttempts= totalAttempts - 1;
+        document.getElementById('ctr-attempt').value = totalAttempts;   
+
+    }
+});
+
+$("#btn-reset").click(function(){
+   curGold = 0;
+   totalAttempts = 20;
+   totalgoldGain = [];
+   totalgoldLoss = [];
+   $("#current-gold").val(curGold);
+   $("#ctr-attempt").val(totalAttempts);
+   $("#log-result-gain").html("");
+   $("#log-result-loss").html("");
+   $("#log-result").html("");
+   $("#total-loss").val("0");
+   $("#total-gain").val("0");
+   $("#btn-cave").prop('disabled', false);
+   $("#btn-house").prop('disabled', false);
+   $("#btn-casino").prop('disabled', false);
+   $("#btn-goldmine").prop('disabled', false);
+    $("#ninja").animate({
+    right: "-1"
+  });
+});
+
+});  
+
+</script>
+
+
+</body>
+</html>
